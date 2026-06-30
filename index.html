@@ -4,57 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRIVATE FREEZE CLUMSY</title>
+    <title>WEB INTERFACE v3.0.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
-        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
-        .accent-text { color: #bc00ff; }
-        input[type=range] { accent-color: #00ff41; }
+        body { background-color: #050505; color: #737373; font-family: 'Courier New', Courier, monospace; }
+        .cyber-box { border: 1px solid #22c55e; border-radius: 4px; padding: 16px; background-color: #0a0a0a; }
+        .text-green { color: #22c55e; }
+        .status-pill { color: #166534; background: #166534; border-radius: 50%; width: 8px; height: 8px; display: inline-block; }
     </style>
 </head>
-<body class="p-6">
+<body class="p-4">
 
-    <main class="max-w-xl mx-auto space-y-8">
-        <!-- Заголовок -->
-        <header class="text-center">
-            <h1 class="text-2xl font-bold tracking-widest text-white">❄ PRIVATE FREEZE CLUMSY ❄</h1>
-            <p class="text-xs uppercase mt-2">Private Edition</p>
-        </header>
+    <main class="max-w-2xl mx-auto space-y-6">
+        <div class="text-xs uppercase tracking-widest opacity-60">WEB INTERFACE v3.0.4</div>
 
-        <!-- Управление -->
-        <div class="cyber-border p-6 rounded-lg space-y-6">
-            <div class="space-y-4">
-                <label class="block text-sm">MTU Size: 268</label>
-                <input type="range" class="w-full" value="30">
-                <p class="text-[10px] opacity-70">Настройка размера сетевых пакетов (меньше = выше риск лагов)</p>
+        <!-- Контейнер управления -->
+        <div class="cyber-box border-green-600">
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-sm">STATUS:</span>
+                <span class="text-green text-sm flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-green-600"></span> INJECTED & ACTIVE
+                </span>
             </div>
 
-            <button class="w-full py-4 bg-[#bc00ff] text-white font-bold rounded hover:bg-purple-700 transition">
-                INJECT
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-white text-sm mb-2">MTU Size</label>
+                    <input type="range" class="w-full accent-purple-600" value="100">
+                    <div class="text-right text-xs mt-1">1500 bytes</div>
+                </div>
+                <div>
+                    <label class="block text-white text-sm mb-2">Freeze Duration</label>
+                    <input type="range" class="w-full accent-purple-600" value="20">
+                    <div class="text-right text-xs mt-1">2000 ms</div>
+                </div>
+                <div>
+                    <label class="block text-white text-sm mb-2">Window Size</label>
+                    <input type="range" class="w-full accent-purple-600" value="10">
+                    <div class="text-right text-xs mt-1">64 kb</div>
+                </div>
+            </div>
+
+            <button class="w-full mt-8 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold uppercase transition">
+                STOP INJECTION
             </button>
+
+            <!-- Лог -->
+            <div class="mt-6 bg-black p-4 text-[10px] space-y-1 opacity-80 border-t border-neutral-800">
+                <p>[01:43:39] Задержка трафика (Lag applied)...</p>
+                <p>[01:43:40] Выброс накопленных данных (Syncing...)</p>
+                <p>[01:43:41] Фильтр отключен. Драйвер выгружен из памяти.</p>
+                <p>[01:43:42] Запуск WinDivert драйвера...</p>
+                <p>[01:43:43] Фильтрация трафика активирована успешно.</p>
+            </div>
         </div>
 
-        <!-- Описание принципа -->
-        <div class="cyber-border p-6 rounded-lg">
-            <h2 class="text-lg font-bold mb-6 text-white uppercase">Как Clumsy манипулирует сетью?</h2>
-            
-            <div class="space-y-6 text-sm leading-relaxed">
-                <div>
-                    <h3 class="text-white font-bold">1. Перехват</h3>
-                    <p>Инструмент устанавливает фильтр на уровне драйвера, вставая между сетевой картой и приложением.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">2. Модификация</h3>
-                    <p>В реальном времени пакеты либо задерживаются в очереди, либо принудительно отбрасываются.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">3. Отправка</h3>
-                    <p>Искаженный пакет передается дальше, вызывая "фризы" или "телепорты" в играх.</p>
-                </div>
+        <!-- Описание параметров -->
+        <div class="cyber-box">
+            <h2 class="text-white font-bold mb-4 uppercase">Функционал и параметры</h2>
+            <div class="space-y-4 text-sm">
+                <p><strong class="text-white">MTU Size</strong><br>Размер сетевого пакета. Меньшее значение дробит данные, повышая нестабильность соединения.</p>
+                <p><strong class="text-white">Freeze Duration</strong><br>Длительность задержки влияет на то, как долго ваш персонаж будет "заморожен" для сервера.</p>
             </div>
         </div>
     </main>
+
 </body>
 </html>
 

@@ -1,75 +1,72 @@
-
-```react
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Search, TrendingUp } from 'lucide-react';
-
-export default function App() {
-  const [username, setUsername] = useState('');
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchStats = async () => {
-    setLoading(true);
-    try {
-      // Запрос текущих данных и истории
-      const histRes = await fetch(`http://127.0.0.1:8000/api/history/${username}`);
-      const histData = await histRes.json();
-      setHistory(histData.slice(0, 10).reverse());
-    } catch (err) {
-      console.error("Ошибка при получении данных:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Аналитика Telegram</h1>
-
-        <div className="bg-white p-6 rounded-2xl shadow-lg mb-8">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              className="flex-1 p-3 border rounded-xl"
-              placeholder="Введите username канала (без @)"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <button 
-              onClick={fetchStats} 
-              className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
-            >
-              {loading ? 'Анализ...' : 'Проверить'}
-            </button>
-          </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализатор Telegram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
+        <h1 class="text-2xl font-bold mb-5 text-center">Аналитика Telegram</h1>
+        
+        <input type="text" id="username" placeholder="Username канала" 
+               class="w-full p-3 border rounded-lg mb-4">
+               
+        <button onclick="checkChannel()" 
+                class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+                Проверить
+        </button>
+        
+        <div class="mt-6">
+            <canvas id="myChart"></canvas>
         </div>
-
-        {history.length > 0 && (
-          <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <TrendingUp className="text-blue-600" /> История подписчиков
-            </h2>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={history}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis domain={['auto', 'auto']} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="subscribers" stroke="#2563eb" strokeWidth={3} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="text-sm text-gray-500 mt-4 text-center">
-              График отображает последние проверки канала.
-            </p>
-          </div>
-        )}
-      </div>
     </div>
-  );
-}
 
-```
+    <script>
+        let myChart;
+
+        async function checkChannel() {
+            const username = document.getElementById('username').value;
+            if(!username) return alert('Введите имя канала!');
+
+            try {
+                // Запрос отправляется на ваш же сервер Render без хардкода 127.0.0.1
+                const response = await fetch(`/api/history/${username}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                const labels = data.map(item => item.date.slice(11, 16));
+                const values = data.map(item => item.subscribers);
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+                
+                if (myChart) {
+                    myChart.destroy();
+                }
+
+                myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Подписчики',
+                            data: values,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    }
+                });
+            } catch (err) {
+                console.error("Ошибка при получении данных:", err);
+                alert("Не удалось получить данные от сервера.");
+            }
+        }
+    </script>
+</body>
+</html>

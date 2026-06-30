@@ -1,68 +1,72 @@
-```html
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRIVATE FREEZE CLUMSY GUIDE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
-        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
-        .accent-text { color: #bc00ff; }
-    </style>
-</head>
-<body class="p-4 md:p-8">
+import os
+import logging
+import asyncio
+from flask import Flask, render_template
+from threading import Thread
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import Message
+from aiogram.filters import CommandStart
 
-    <main class="max-w-2xl mx-auto space-y-6">
-        <header class="text-center mb-8">
-            <h1 class="text-2xl font-bold tracking-widest text-white">❄ PRIVATE FREEZE CLUMSY ❄</h1>
-        </header>
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
 
-        <!-- Основная панель -->
-        <div class="cyber-border p-6 rounded-lg space-y-4">
-            <button class="w-full py-4 bg-[#bc00ff] text-white font-bold rounded hover:bg-purple-700 transition">INJECT</button>
-        </div>
+# Инициализация Flask
+app = Flask(__name__)
 
-        <!-- Подробный гид -->
-        <div class="cyber-border p-6 rounded-lg">
-            <h2 class="text-xl font-bold mb-6 text-white uppercase border-b border-[#00ff41] pb-2">Функционал и параметры</h2>
-            
-            <div class="space-y-6 text-sm">
-                <div>
-                    <h3 class="text-white font-bold">MTU Size</h3>
-                    <p>Размер сетевого пакета. Меньшее значение дробит данные, повышая нестабильность соединения.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">Freeze Duration</h3>
-                    <p>Длительность задержки (в мс). Влияет на то, как долго ваш персонаж будет "заморожен" для сервера.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">Unfreeze Sync</h3>
-                    <p>Синхронизация разморозки. Определяет скорость передачи накопленных данных после снятия фриза.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">Auto-Stop & Interval</h3>
-                    <p>Автоматизация цикла работы. Настраивает время работы фриза и паузы между повторными активациями.</p>
-                </div>
-                <div>
-                    <h3 class="text-white font-bold">Window Size</h3>
-                    <p>Ширина диапазона пакетов, попадающих под фильтрацию. Чем больше, тем массивнее "захват" трафика.</p>
-                </div>
-            </div>
-        </div>
+# Настройки бота (Ошибку с отсутствующим '=' исправили)
+BOT_TOKEN = "8997716327:AAHlY2OEIYJ_E_oisD8D7yK9LirE0Yo2e_w"
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
-        <!-- Принцип работы -->
-        <div class="cyber-border p-6 rounded-lg">
-            <h2 class="text-lg font-bold mb-4 text-white uppercase">Принцип работы</h2>
-            <ul class="text-sm space-y-3 leading-relaxed">
-                <li><span class="text-white">1. Перехват:</span> Установка драйверного фильтра между сетью и игрой.</li>
-                <li><span class="text-white">2. Модификация:</span> Удержание пакетов в очереди (Lag) или их отбрасывание (Drop).</li>
-                <li><span class="text-white">3. Отправка:</span> Резкий выброс накопленных данных, вызывающий "телепортацию".</li>
-            </ul>
-        </div>
-    </main>
-</body>
-</html>
+# Список ключевых слов для отслеживания
+KEYWORDS = ["важно", "срочно", "помощь", "купить", "python"]
 
-```
+# --- Логика веб-сайта Flask ---
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# --- Логика Telegram-бота ---
+@dp.message(CommandStart())
+async def start_cmd(message: Message):
+    await message.answer("Бот-трекер запущен. Я фиксирую сообщения в доступных мне чатах.")
+
+@dp.message()
+async def track_messages(message: Message):
+    text = message.text or ""
+    user = message.from_user.full_name if message.from_user else "Аноним"
+    username = f"@{message.from_user.username}" if message.from_user.username else "нет юзернейма"
+    chat_name = message.chat.title if message.chat.title else "Личный чат"
+    
+    log_entry = f"[{chat_name}] {user} ({username}): {text}\n"
+    print(log_entry, end="")
+    
+    # Запись логов в файл
+    with open("messages_log.txt", "a", encoding="utf-8") as file:
+        file.write(log_entry)
+        
+    for word in KEYWORDS:
+        if word in text.lower():
+            await message.reply(f"🔔 Обнаружено ключевое слово: {word}")
+            break
+
+# Функция для запуска бота в событии asyncio
+async def run_bot():
+    logging.info("Бот начал отслеживание сообщений...")
+    await dp.start_polling(bot)
+
+# Запуск асинхронного бота внутри обычного потока (нужно для Render)
+def start_bot_thread():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(run_bot())
+
+# Запускаем поток с ботом перед стартом Flask
+bot_thread = Thread(target=start_bot_thread, daemon=True)
+bot_thread.start()
+
+# Точка запуска для локального тестирования
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+

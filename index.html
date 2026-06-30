@@ -5,63 +5,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FREEZE CLUMSY PRO</title>
+    <!-- Подключаем Tailwind для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
-        .terminal-text { color: #22c55e; }
-        .btn-injected { background: #9d174d !important; cursor: not-allowed; opacity: 0.7; }
+        body { background: #000; color: #fff; font-family: monospace; overflow: hidden; }
+        .terminal-log { color: #22c55e; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; }
+        .injected-state { background: #831843 !important; cursor: not-allowed; border-color: #be185d; }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen w-screen m-0">
+<body class="flex items-center justify-center min-h-screen">
 
-    <div id="container" class="w-[90%] max-w-sm border border-emerald-900/50 p-6 bg-[#0a0a0a] rounded-lg shadow-2xl">
+    <div class="w-[90%] max-w-sm border border-emerald-900 bg-[#0a0a0a] p-6 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
         <h1 class="text-center text-lg font-bold mb-6 tracking-widest">❄ FREEZE CLUMSY PRO ❄</h1>
         
-        <button id="injectBtn" class="w-full py-3 bg-pink-600 font-bold rounded border border-pink-500 shadow-[0_0_10px_rgba(219,39,119,0.5)] hover:bg-pink-500 transition-all">
+        <button id="btnInject" class="w-full py-3 bg-pink-600 font-bold rounded border border-pink-500 hover:bg-pink-500 transition-all">
             INJECTED
         </button>
 
-        <button id="stopBtn" class="w-full mt-3 py-2 border border-red-500 text-red-500 hover:bg-red-950 transition-all">
+        <button id="btnStop" class="w-full mt-3 py-2 border border-red-500 text-red-500 hover:bg-red-950 transition-all">
             EMERGENCY STOP
         </button>
 
-        <div id="terminal" class="mt-6 p-4 border border-gray-800 bg-black text-sm h-32 overflow-y-auto">
-            <div class="terminal-text">[SYSTEM] Ожидание инициализации...</div>
+        <div id="terminal" class="mt-6 p-4 border border-gray-800 bg-black text-xs h-32 overflow-y-auto">
+            <div class="terminal-log">[SYSTEM] Ожидание инициализации...</div>
         </div>
     </div>
 
     <script>
         const terminal = document.getElementById('terminal');
-        const injectBtn = document.getElementById('injectBtn');
-        const stopBtn = document.getElementById('stopBtn');
+        const btnInject = document.getElementById('btnInject');
+        const btnStop = document.getElementById('btnStop');
 
-        function addLine(text) {
-            const line = document.createElement('div');
-            line.className = 'terminal-text mt-1';
-            line.textContent = '> ' + text;
-            terminal.appendChild(line);
+        function log(message) {
+            const div = document.createElement('div');
+            div.className = 'terminal-log';
+            div.textContent = '> ' + message;
+            terminal.appendChild(div);
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        injectBtn.addEventListener('click', () => {
-            if (injectBtn.classList.contains('btn-injected')) return;
+        btnInject.addEventListener('click', () => {
+            if (btnInject.classList.contains('injected-state')) return;
             
-            addLine("Запуск процесса инъекции...");
-            injectBtn.textContent = "INJECTING...";
+            btnInject.textContent = "INJECTING...";
+            log("Запуск процесса инъекции...");
             
             setTimeout(() => {
-                addLine("[SUCCESS] Драйвер внедрен. Модуль фриза активен.");
-                injectBtn.textContent = "INJECTED";
-                injectBtn.classList.add('btn-injected');
-            }, 1500);
+                log("[SUCCESS] Драйвер внедрен. Модуль фриза активен.");
+                btnInject.textContent = "INJECTED";
+                btnInject.classList.add('injected-state');
+            }, 1200);
         });
 
-        stopBtn.addEventListener('click', () => {
-            addLine("[WARNING] Экстренная остановка!");
-            addLine("[SYSTEM] Модули выгружены.");
-            injectBtn.textContent = "INJECTED";
-            injectBtn.classList.remove('btn-injected');
-            injectBtn.style.background = ""; // Сброс цвета
+        btnStop.addEventListener('click', () => {
+            log("[WARNING] Экстренная остановка!");
+            log("[SYSTEM] Модули выгружены.");
+            btnInject.textContent = "INJECTED";
+            btnInject.classList.remove('injected-state');
         });
     </script>
 </body>

@@ -4,66 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FREEZE CLUMSY PRO</title>
-    <!-- Подключаем Tailwind для стилизации -->
+    <title>PRIVATE FREEZE CLUMSY GUIDE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: monospace; overflow: hidden; }
-        .terminal-log { color: #22c55e; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; }
-        .injected-state { background: #831843 !important; cursor: not-allowed; border-color: #be185d; }
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
+        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+        .accent-text { color: #bc00ff; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="p-4 md:p-8">
 
-    <div class="w-[90%] max-w-sm border border-emerald-900 bg-[#0a0a0a] p-6 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-        <h1 class="text-center text-lg font-bold mb-6 tracking-widest">❄ FREEZE CLUMSY PRO ❄</h1>
-        
-        <button id="btnInject" class="w-full py-3 bg-pink-600 font-bold rounded border border-pink-500 hover:bg-pink-500 transition-all">
-            INJECTED
-        </button>
+    <main class="max-w-2xl mx-auto space-y-6">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold tracking-widest text-white">❄ PRIVATE FREEZE CLUMSY ❄</h1>
+        </header>
 
-        <button id="btnStop" class="w-full mt-3 py-2 border border-red-500 text-red-500 hover:bg-red-950 transition-all">
-            EMERGENCY STOP
-        </button>
-
-        <div id="terminal" class="mt-6 p-4 border border-gray-800 bg-black text-xs h-32 overflow-y-auto">
-            <div class="terminal-log">[SYSTEM] Ожидание инициализации...</div>
+        <!-- Основная панель -->
+        <div class="cyber-border p-6 rounded-lg space-y-4">
+            <button class="w-full py-4 bg-[#bc00ff] text-white font-bold rounded hover:bg-purple-700 transition">INJECT</button>
         </div>
-    </div>
 
-    <script>
-        const terminal = document.getElementById('terminal');
-        const btnInject = document.getElementById('btnInject');
-        const btnStop = document.getElementById('btnStop');
-
-        function log(message) {
-            const div = document.createElement('div');
-            div.className = 'terminal-log';
-            div.textContent = '> ' + message;
-            terminal.appendChild(div);
-            terminal.scrollTop = terminal.scrollHeight;
-        }
-
-        btnInject.addEventListener('click', () => {
-            if (btnInject.classList.contains('injected-state')) return;
+        <!-- Подробный гид -->
+        <div class="cyber-border p-6 rounded-lg">
+            <h2 class="text-xl font-bold mb-6 text-white uppercase border-b border-[#00ff41] pb-2">Функционал и параметры</h2>
             
-            btnInject.textContent = "INJECTING...";
-            log("Запуск процесса инъекции...");
-            
-            setTimeout(() => {
-                log("[SUCCESS] Драйвер внедрен. Модуль фриза активен.");
-                btnInject.textContent = "INJECTED";
-                btnInject.classList.add('injected-state');
-            }, 1200);
-        });
+            <div class="space-y-6 text-sm">
+                <div>
+                    <h3 class="text-white font-bold">MTU Size</h3>
+                    <p>Размер сетевого пакета. Меньшее значение дробит данные, повышая нестабильность соединения.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Freeze Duration</h3>
+                    <p>Длительность задержки (в мс). Влияет на то, как долго ваш персонаж будет "заморожен" для сервера.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Unfreeze Sync</h3>
+                    <p>Синхронизация разморозки. Определяет скорость передачи накопленных данных после снятия фриза.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Auto-Stop & Interval</h3>
+                    <p>Автоматизация цикла работы. Настраивает время работы фриза и паузы между повторными активациями.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Window Size</h3>
+                    <p>Ширина диапазона пакетов, попадающих под фильтрацию. Чем больше, тем массивнее "захват" трафика.</p>
+                </div>
+            </div>
+        </div>
 
-        btnStop.addEventListener('click', () => {
-            log("[WARNING] Экстренная остановка!");
-            log("[SYSTEM] Модули выгружены.");
-            btnInject.textContent = "INJECTED";
-            btnInject.classList.remove('injected-state');
-        });
-    </script>
+        <!-- Принцип работы -->
+        <div class="cyber-border p-6 rounded-lg">
+            <h2 class="text-lg font-bold mb-4 text-white uppercase">Принцип работы</h2>
+            <ul class="text-sm space-y-3 leading-relaxed">
+                <li><span class="text-white">1. Перехват:</span> Установка драйверного фильтра между сетью и игрой.</li>
+                <li><span class="text-white">2. Модификация:</span> Удержание пакетов в очереди (Lag) или их отбрасывание (Drop).</li>
+                <li><span class="text-white">3. Отправка:</span> Резкий выброс накопленных данных, вызывающий "телепортацию".</li>
+            </ul>
+        </div>
+    </main>
 </body>
 </html>
 

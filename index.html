@@ -5,71 +5,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEB INTERFACE v3.0.4</title>
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRIVATE FREEZE V3.0.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #050505; color: #737373; font-family: 'Courier New', Courier, monospace; }
-        .cyber-box { border: 1px solid #22c55e; border-radius: 4px; padding: 16px; background-color: #0a0a0a; }
-        .text-green { color: #22c55e; }
-        .status-pill { color: #166534; background: #166534; border-radius: 50%; width: 8px; height: 8px; display: inline-block; }
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
+        .cyber-border { border: 1px solid #00ff41; background: #0a0a0a; }
+        .accent-text { color: #bc00ff; }
+        input[type=range] { accent-color: #bc00ff; }
     </style>
 </head>
 <body class="p-4">
 
     <main class="max-w-2xl mx-auto space-y-6">
-        <div class="text-xs uppercase tracking-widest opacity-60">WEB INTERFACE v3.0.4</div>
+        <!-- Заголовок -->
+        <header class="text-center">
+            <h1 class="text-2xl font-bold tracking-widest text-white">❄ PRIVATE FREEZE CLUMSY ❄</h1>
+            <p class="text-xs opacity-60">SYSTEM INTEGRATION V3.0.4</p>
+        </header>
 
-        <!-- Контейнер управления -->
-        <div class="cyber-box border-green-600">
-            <div class="flex justify-between items-center mb-8">
+        <!-- Основная панель -->
+        <div class="cyber-border p-6 rounded shadow-lg">
+            <div class="flex justify-between items-center mb-6">
                 <span class="text-sm">STATUS:</span>
-                <span class="text-green text-sm flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-green-600"></span> INJECTED & ACTIVE
+                <span class="text-green-500 text-sm flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> ACTIVE
                 </span>
             </div>
 
             <div class="space-y-6">
                 <div>
-                    <label class="block text-white text-sm mb-2">MTU Size</label>
-                    <input type="range" class="w-full accent-purple-600" value="100">
-                    <div class="text-right text-xs mt-1">1500 bytes</div>
+                    <label class="block text-white text-sm mb-2">MTU Size: 268</label>
+                    <input type="range" class="w-full" value="30">
+                    <p class="text-[10px] opacity-70 mt-1">Размер сетевых пакетов. Меньше = выше нестабильность.</p>
                 </div>
                 <div>
-                    <label class="block text-white text-sm mb-2">Freeze Duration</label>
-                    <input type="range" class="w-full accent-purple-600" value="20">
-                    <div class="text-right text-xs mt-1">2000 ms</div>
-                </div>
-                <div>
-                    <label class="block text-white text-sm mb-2">Window Size</label>
-                    <input type="range" class="w-full accent-purple-600" value="10">
-                    <div class="text-right text-xs mt-1">64 kb</div>
+                    <label class="block text-white text-sm mb-2">Freeze Duration: 159ms</label>
+                    <input type="range" class="w-full" value="40">
+                    <p class="text-[10px] opacity-70 mt-1">Время задержки пакетов (основа «фриза» персонажа).</p>
                 </div>
             </div>
 
-            <button class="w-full mt-8 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold uppercase transition">
-                STOP INJECTION
+            <button class="w-full mt-8 py-3 bg-[#bc00ff] text-white font-bold hover:bg-purple-700 transition uppercase">
+                INJECT ENGINE
             </button>
+        </div>
 
-            <!-- Лог -->
-            <div class="mt-6 bg-black p-4 text-[10px] space-y-1 opacity-80 border-t border-neutral-800">
-                <p>[01:43:39] Задержка трафика (Lag applied)...</p>
-                <p>[01:43:40] Выброс накопленных данных (Syncing...)</p>
-                <p>[01:43:41] Фильтр отключен. Драйвер выгружен из памяти.</p>
-                <p>[01:43:42] Запуск WinDivert драйвера...</p>
-                <p>[01:43:43] Фильтрация трафика активирована успешно.</p>
+        <!-- Справочник функций -->
+        <div class="cyber-border p-6 rounded">
+            <h2 class="text-white font-bold mb-4 uppercase border-b border-[#00ff41] pb-2">Справочник функций</h2>
+            <div class="space-y-4 text-sm leading-relaxed">
+                <div>
+                    <strong class="text-white">Потеря пакетов (Drop):</strong> Принудительное удаление данных. Заставляет сервер "терять" ваши команды, вызывая телепорты.
+                </div>
+                <div>
+                    <strong class="text-white">Задержка (Lag):</strong> Удержание исходящего потока. Сервер видит старые координаты, пока вы "заморожены".
+                </div>
+                <div>
+                    <strong class="text-white">Длительность задержки:</strong> Параметр, определяющий время "фриза". Длительная задержка делает вас невидимым/неуязвимым для противников на время её действия.
+                </div>
+                <div>
+                    <strong class="text-white">Window Size:</strong> Количество пакетов, которые фильтр "берет в плен" за один цикл.
+                </div>
             </div>
         </div>
 
-        <!-- Описание параметров -->
-        <div class="cyber-box">
-            <h2 class="text-white font-bold mb-4 uppercase">Функционал и параметры</h2>
-            <div class="space-y-4 text-sm">
-                <p><strong class="text-white">MTU Size</strong><br>Размер сетевого пакета. Меньшее значение дробит данные, повышая нестабильность соединения.</p>
-                <p><strong class="text-white">Freeze Duration</strong><br>Длительность задержки влияет на то, как долго ваш персонаж будет "заморожен" для сервера.</p>
+        <!-- Механика работы -->
+        <div class="cyber-border p-6 rounded">
+            <h2 class="text-white font-bold mb-4 uppercase">Механика манипуляции</h2>
+            <div class="text-sm space-y-3 opacity-90">
+                <p>1. <span class="text-white">Перехват:</span> Установка драйверного фильтра на сетевой поток.</p>
+                <p>2. <span class="text-white">Модификация:</span> Удержание или сброс пакетов в реальном времени.</p>
+                <p>3. <span class="text-white">Синхронизация:</span> Резкая отправка накопленного стека данных, вызывающая визуальный "телепорт".</p>
             </div>
         </div>
     </main>
 
 </body>
 </html>
+
+```
+    l>
 
 ```

@@ -1,100 +1,70 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRIVATE FREEZE CLUMSY PRO</title>
+    <title>FREEZE CLUMSY PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; overflow-x: hidden; }
-        canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 0; }
-        .content-layer { position: relative; z-index: 1; }
-        .cyber-border { border: 1px solid #00ff41; background: rgba(10, 10, 10, 0.8); }
-        .btn-inject { background: #bc00ff; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(188, 0, 255, 0.4); }
-        .btn-inject.active { background: #ff0055; box-shadow: 0 0 30px #ff0055; animation: pulse 1s infinite; transform: scale(1.02); }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        input[type=range] { accent-color: #bc00ff; }
+        body { background: #000; color: #fff; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
+        .terminal-text { color: #22c55e; }
+        .btn-injected { background: #9d174d !important; cursor: not-allowed; opacity: 0.7; }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <canvas id="snowCanvas"></canvas>
+<body class="flex items-center justify-center h-screen w-screen m-0">
 
-    <main class="content-layer max-w-2xl mx-auto space-y-6">
-        <header class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-white tracking-widest uppercase">❄ Freeze Clumsy Pro ❄</h1>
-        </header>
+    <div id="container" class="w-[90%] max-w-sm border border-emerald-900/50 p-6 bg-[#0a0a0a] rounded-lg shadow-2xl">
+        <h1 class="text-center text-lg font-bold mb-6 tracking-widest">❄ FREEZE CLUMSY PRO ❄</h1>
+        
+        <button id="injectBtn" class="w-full py-3 bg-pink-600 font-bold rounded border border-pink-500 shadow-[0_0_10px_rgba(219,39,119,0.5)] hover:bg-pink-500 transition-all">
+            INJECTED
+        </button>
 
-        <div class="cyber-border p-6 rounded-lg space-y-6">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs uppercase font-bold text-white">MTU Size: <span id="mtu-val">1500</span></label>
-                    <input type="range" class="w-full h-2 rounded bg-zinc-800 appearance-none cursor-pointer" min="500" max="1500" value="1500" oninput="document.getElementById('mtu-val').innerText = this.value">
-                </div>
-                <div>
-                    <label class="block text-xs uppercase font-bold text-white">Freeze Duration: <span id="freeze-val">2000</span></label>
-                    <input type="range" class="w-full h-2 rounded bg-zinc-800 appearance-none cursor-pointer" min="100" max="5000" value="2000" oninput="document.getElementById('freeze-val').innerText = this.value">
-                </div>
-            </div>
+        <button id="stopBtn" class="w-full mt-3 py-2 border border-red-500 text-red-500 hover:bg-red-950 transition-all">
+            EMERGENCY STOP
+        </button>
 
-            <button id="inject-btn" onclick="toggleInject()" class="w-full py-4 text-white font-bold rounded uppercase btn-inject transition">INJECT</button>
-            <button id="emergency-btn" onclick="toggleInject()" class="hidden w-full py-2 bg-zinc-900 text-red-500 font-bold rounded border border-red-900 text-xs uppercase">EMERGENCY STOP</button>
-
-            <div id="terminal" class="bg-black border border-zinc-800 p-3 rounded h-24 overflow-y-auto text-[10px] text-zinc-500 font-mono">
-                <div>[SYSTEM] Ожидание инициализации...</div>
-            </div>
+        <div id="terminal" class="mt-6 p-4 border border-gray-800 bg-black text-sm h-32 overflow-y-auto">
+            <div class="terminal-text">[SYSTEM] Ожидание инициализации...</div>
         </div>
-
-        <div class="cyber-border p-6 rounded-lg">
-            <h2 class="text-lg font-bold mb-4 text-white uppercase border-b border-[#00ff41] pb-2">Функционал</h2>
-            <div class="space-y-3 text-xs text-zinc-400">
-                <p><strong class="text-white">MTU Size:</strong> Размер сетевого пакета. Меньшее значение повышает риск лагов.</p>
-                <p><strong class="text-white">Freeze Duration:</strong> Время заморозки трафика в мс.</p>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // Эффект снега
-        const canvas = document.getElementById('snowCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const flakes = Array.from({length: 40}, () => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*2+1, speed: Math.random()*0.8+0.2}));
-        
-        function drawSnow() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = '#ffffff';
-            flakes.forEach(f => {
-                ctx.beginPath();
-                ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
-                ctx.fill();
-                f.y += f.speed;
-                if(f.y > canvas.height) f.y = -5;
-            });
-            requestAnimationFrame(drawSnow);
-        }
-        drawSnow();
+        const terminal = document.getElementById('terminal');
+        const injectBtn = document.getElementById('injectBtn');
+        const stopBtn = document.getElementById('stopBtn');
 
-        // Логика кнопок
-        let active = false;
-        function toggleInject() {
-            active = !active;
-            const btn = document.getElementById('inject-btn');
-            const emerg = document.getElementById('emergency-btn');
-            const term = document.getElementById('terminal');
-            if(active) {
-                btn.innerText = "INJECTED";
-                btn.classList.add('active');
-                emerg.classList.remove('hidden');
-                term.innerHTML += "<div>[SUCCESS] Фильтр активен.</div>";
-            } else {
-                btn.innerText = "INJECT";
-                btn.classList.remove('active');
-                emerg.classList.add('hidden');
-                term.innerHTML += "<div>[WARN] Остановка процесса.</div>";
-            }
-            term.scrollTop = term.scrollHeight;
+        function addLine(text) {
+            const line = document.createElement('div');
+            line.className = 'terminal-text mt-1';
+            line.textContent = '> ' + text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
         }
+
+        injectBtn.addEventListener('click', () => {
+            if (injectBtn.classList.contains('btn-injected')) return;
+            
+            addLine("Запуск процесса инъекции...");
+            injectBtn.textContent = "INJECTING...";
+            
+            setTimeout(() => {
+                addLine("[SUCCESS] Драйвер внедрен. Модуль фриза активен.");
+                injectBtn.textContent = "INJECTED";
+                injectBtn.classList.add('btn-injected');
+            }, 1500);
+        });
+
+        stopBtn.addEventListener('click', () => {
+            addLine("[WARNING] Экстренная остановка!");
+            addLine("[SYSTEM] Модули выгружены.");
+            injectBtn.textContent = "INJECTED";
+            injectBtn.classList.remove('btn-injected');
+            injectBtn.style.background = ""; // Сброс цвета
+        });
     </script>
 </body>
 </html>
+
+```

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRIVATE FREEZE CLUMSY GUIDE & SIMULATOR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
+        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+        .accent-text { color: #bc00ff; }
+        .cyber-btn { background: #bc00ff; text-shadow: 0 0 5px rgba(255,255,255,0.5); box-shadow: 0 0 15px rgba(188, 0, 255, 0.4); }
+        .cyber-btn.active { background: #ff0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.6); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-[#111] border border-[#00ff41] text-[#00ff41] px-5 py-3 rounded text-xs font-bold shadow-2xl">
+        <span id="toast-text">СИСТЕМА ИНИЦИАЛИЗИРОВАНА</span>
+    </div>
+
+    <main class="max-w-2xl mx-auto space-y-6">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold tracking-widest text-white animate-pulse">❄ PRIVATE FREEZE CLUMSY ❄</h1>
+            <p class="text-xs text-zinc-500 mt-1 font-mono">WEB INTERFACE v3.0.4</p>
+        </header>
+
+        <div class="cyber-border p-6 rounded-lg space-y-6 bg-[#0a0a0a]">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                <span class="text-xs font-bold text-zinc-400">STATUS:</span>
+                <span id="status-indicator" class="text-xs font-bold text-red-500 tracking-widest">● DISCONNECTED</span>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-white font-bold">MTU Size</span>
+                        <span id="val-mtu" class="text-zinc-400">1500 bytes</span>
+                    </div>
+                    <input type="range" min="576" max="1500" value="1500" class="w-full accent-[#bc00ff] bg-zinc-900" oninput="updateVal('mtu', this.value + ' bytes')">
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-white font-bold">Freeze Duration</span>
+                        <span id="val-freeze" class="text-zinc-400">3000 ms</span>
+                    </div>
+                    <input type="range" min="500" max="10000" step="100" value="3000" class="w-full accent-[#bc00ff] bg-zinc-900" oninput="updateVal('freeze', this.value + ' ms')">
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-white font-bold">Window Size</span>
+                        <span id="val-window" class="text-zinc-400">64 kb</span>
+                    </div>
+                    <input type="range" min="16" max="256" step="16" value="64" class="w-full accent-[#bc00ff] bg-zinc-900" oninput="updateVal('window', this.value + ' kb')">
+                </div>
+            </div>
+
+            <button id="inject-btn" onclick="toggleInject()" class="cyber-btn w-full py-4 text-white font-bold rounded hover:opacity-90 transition uppercase tracking-widest text-sm">INJECT</button>
+            
+            <div id="terminal" class="bg-black border border-zinc-900 p-3 rounded h-32 overflow-y-auto text-[10px] font-mono text-zinc-500 space-y-1">
+                <div>[SYSTEM] Ожидание запуска инжектора...</div>
+            </div>
+        </div>
+
+        <div class="cyber-border p-6 rounded-lg bg-[#0a0a0a]">
+            <h2 class="text-xl font-bold mb-6 text-white uppercase border-b border-[#00ff41] pb-2">Функционал и параметры</h2>
+            
+            <div class="space-y-6 text-sm">
+                <div>
+                    <h3 class="text-white font-bold">MTU Size</h3>
+                    <p class="text-zinc-400 text-xs mt-1">Размер сетевого пакета. Меньшее значение дробит данные, повышая нестабильность соединения.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Freeze Duration</h3>
+                    <p class="text-zinc-400 text-xs mt-1">Длительность задержки (в мс). Влияет на то, как долго ваш персонаж будет "заморожен" для сервера.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Unfreeze Sync</h3>
+                    <p class="text-zinc-400 text-xs mt-1">Синхронизация разморозки. Определяет скорость передачи накопленных данных после снятия фриза.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Auto-Stop & Interval</h3>
+                    <p class="text-zinc-400 text-xs mt-1">Автоматизация цикла работы. Настраивает время работы фриза и паузы между повторными активациями.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold">Window Size</h3>
+                    <p class="text-zinc-400 text-xs mt-1">Ширина диапазона пакетов, попадающих под фильтрацию. Чем больше, тем массивнее "захват" трафика.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cyber-border p-6 rounded-lg bg-[#0a0a0a]">
+            <h2 class="text-lg font-bold mb-4 text-white uppercase border-b border-zinc-800 pb-2">Принцип работы</h2>
+            <ul class="text-xs space-y-3 leading-relaxed text-zinc-400">
+                <li><span class="text-white font-bold">1. Перехват:</span> Установка драйверного фильтра между сетью и игрой.</li>
+                <li><span class="text-white font-bold">2. Модификация:</span> Удержание пакетов в очереди (Lag) или их отбрасывание (Drop).</li>
+                <li><span class="text-white font-bold">3. Отправка:</span> Резкий выброс накопленных данных, вызывающий "телепортацию".</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        let isInjecting = false;
+        let logInterval;
+
+        function updateVal(id, val) {
+            document.getElementById('val-' + id).innerText = val;
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = text;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2000);
+        }
+
+        function addLog(text, type = 'info') {
+            const term = document.getElementById('terminal');
+            const log = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML = `[${time}] <span class="${type === 'success' ? 'text-[#00ff41]' : type === 'warn' ? 'text-yellow-500' : 'text-zinc-500'}">${text}</span>`;
+            term.appendChild(log);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function toggleInject() {
+            const btn = document.getElementById('inject-btn');
+            const status = document.getElementById('status-indicator');
+            isInjecting = !isInjecting;
+
+            if (isInjecting) {
+                btn.innerText = "STOP INJECTION";
+                btn.classList.add('active');
+                status.innerText = "● INJECTED & ACTIVE";
+                status.className = "text-xs font-bold text-[#00ff41] tracking-widest animate-pulse";
+                showToast("ПАКЕТНЫЙ ФИЛЬТР УСПЕШНО ИНИЦИАЛИЗИРОВАН");
+                addLog("Запуск WinDivert драйвера...", 'info');
+                addLog("Фильтрация трафика активирована успешно.", 'success');
+                
+                // Симуляция бегущих логов трафика
+                logInterval = setInterval(() => {
+                    const actions = [
+                        "Перехвачен пакет outbound UDP", 
+                        "Задержка трафика (Lag applied)...", 
+                        "Пакет удержан в очереди", 
+                        "Выброс накопленных данных (Syncing...)"
+                    ];
+                    const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                    addLog(randomAction, randomAction.includes('Syncing') || randomAction.includes('успешно') ? 'success' : 'warn');
+                }, 1200);
+
+            } else {
+                btn.innerText = "INJECT";
+                btn.classList.remove('active');
+                status.innerText = "● DISCONNECTED";
+                status.className = "text-xs font-bold text-red-500 tracking-widest";
+                showToast("ПРОЦЕСС ОСТАНОВЛЕН");
+                clearInterval(logInterval);
+                addLog("Фильтр отключен. Драйвер выгружен из памяти.", 'warn');
+            }
+        }
+    </script>
+</body>
+</html>

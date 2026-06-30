@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -14,6 +13,7 @@
         .btn-inject { background: #bc00ff; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(188, 0, 255, 0.4); }
         .btn-inject.active { background: #ff0055; box-shadow: 0 0 30px #ff0055; animation: pulse 1s infinite; transform: scale(1.02); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        input[type=range] { accent-color: #bc00ff; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -25,18 +25,30 @@
         </header>
 
         <div class="cyber-border p-6 rounded-lg space-y-6">
-            <!-- Кнопка Инжекта -->
-            <button id="inject-btn" onclick="toggleInject()" class="w-full py-4 text-white font-bold rounded hover:opacity-90 transition uppercase btn-inject">
-                INJECT
-            </button>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-white">MTU Size: <span id="mtu-val">1500</span></label>
+                    <input type="range" class="w-full h-2 rounded bg-zinc-800 appearance-none cursor-pointer" min="500" max="1500" value="1500" oninput="document.getElementById('mtu-val').innerText = this.value">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase font-bold text-white">Freeze Duration: <span id="freeze-val">2000</span></label>
+                    <input type="range" class="w-full h-2 rounded bg-zinc-800 appearance-none cursor-pointer" min="100" max="5000" value="2000" oninput="document.getElementById('freeze-val').innerText = this.value">
+                </div>
+            </div>
 
-            <!-- Кнопка Экстренной остановки (скрыта по умолчанию) -->
-            <button id="emergency-btn" onclick="toggleInject()" class="hidden w-full py-2 bg-zinc-800 text-red-500 font-bold rounded border border-red-900 text-xs uppercase hover:bg-zinc-700">
-                EMERGENCY STOP
-            </button>
+            <button id="inject-btn" onclick="toggleInject()" class="w-full py-4 text-white font-bold rounded uppercase btn-inject transition">INJECT</button>
+            <button id="emergency-btn" onclick="toggleInject()" class="hidden w-full py-2 bg-zinc-900 text-red-500 font-bold rounded border border-red-900 text-xs uppercase">EMERGENCY STOP</button>
 
             <div id="terminal" class="bg-black border border-zinc-800 p-3 rounded h-24 overflow-y-auto text-[10px] text-zinc-500 font-mono">
                 <div>[SYSTEM] Ожидание инициализации...</div>
+            </div>
+        </div>
+
+        <div class="cyber-border p-6 rounded-lg">
+            <h2 class="text-lg font-bold mb-4 text-white uppercase border-b border-[#00ff41] pb-2">Функционал</h2>
+            <div class="space-y-3 text-xs text-zinc-400">
+                <p><strong class="text-white">MTU Size:</strong> Размер сетевого пакета. Меньшее значение повышает риск лагов.</p>
+                <p><strong class="text-white">Freeze Duration:</strong> Время заморозки трафика в мс.</p>
             </div>
         </div>
     </main>
@@ -47,22 +59,17 @@
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        const flakes = Array.from({length: 50}, () => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 3 + 1,
-            speed: Math.random() * 1 + 0.5
-        }));
-
+        const flakes = Array.from({length: 40}, () => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*2+1, speed: Math.random()*0.8+0.2}));
+        
         function drawSnow() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'white';
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = '#ffffff';
             flakes.forEach(f => {
                 ctx.beginPath();
-                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
                 ctx.fill();
                 f.y += f.speed;
-                if (f.y > canvas.height) f.y = -5;
+                if(f.y > canvas.height) f.y = -5;
             });
             requestAnimationFrame(drawSnow);
         }
@@ -75,22 +82,19 @@
             const btn = document.getElementById('inject-btn');
             const emerg = document.getElementById('emergency-btn');
             const term = document.getElementById('terminal');
-
-            if (active) {
+            if(active) {
                 btn.innerText = "INJECTED";
                 btn.classList.add('active');
                 emerg.classList.remove('hidden');
-                term.innerHTML += "<div>[SUCCESS] Драйвер внедрен. Модуль фриза активен.</div>";
+                term.innerHTML += "<div>[SUCCESS] Фильтр активен.</div>";
             } else {
                 btn.innerText = "INJECT";
                 btn.classList.remove('active');
                 emerg.classList.add('hidden');
-                term.innerHTML += "<div>[WARN] Процесс остановлен.</div>";
+                term.innerHTML += "<div>[WARN] Остановка процесса.</div>";
             }
             term.scrollTop = term.scrollHeight;
         }
     </script>
 </body>
 </html>
-
-```

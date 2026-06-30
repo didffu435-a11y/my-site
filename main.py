@@ -1,31 +1,46 @@
 import os
 import logging
 import asyncio
+import random
+from datetime import datetime, timedelta
 from threading import Thread
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters import CommandStart
 
-# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# 1. Инициализация Flask для сайта
 app = Flask(__name__)
 
-# 2. Инициализация aiogram для бота
 BOT_TOKEN = "8997716327:AAHlY2OEIYJ_E_oisD8D7yK9LirE0Yo2e_w"
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 KEYWORDS = ["важно", "срочно", "помощь", "купить", "python"]
 
-# --- МАРШРУТЫ FLASK (САЙТ) ---
+# --- МАРШРУТЫ FLASK ---
 
 @app.route('/')
 def home():
-    # Теперь при переходе на главную страницу сразу откроется ваш новый файл!
     return render_template('my_file.html')
+
+# Добавляем API-путь, который запрашивает ваш HTML-файл для постройки графиков
+@app.route('/api/history/<username>')
+def get_history(username):
+    # Генерируем случайную красивую статистику для демонстрации на графике
+    mock_data = []
+    base_subscribers = random.randint(1000, 5000)
+    now = datetime.now()
+    
+    for i in range(10):
+        time_label = (now - timedelta(minutes=10-i)).strftime("%Y-%m-%d %H:%M:%S")
+        base_subscribers += random.randint(-15, 30)
+        mock_data.append({
+            "date": time_label,
+            "subscribers": base_subscribers
+        })
+    return jsonify(mock_data)
 
 # --- ЛОГИКА TELEGRAM-БОТА ---
 
@@ -60,7 +75,6 @@ def start_bot_in_background():
     asyncio.set_event_loop(loop)
     loop.run_until_complete(run_bot())
 
-# Запускаем бота в фоне
 bot_thread = Thread(target=start_bot_in_background, daemon=True)
 bot_thread.start()
 

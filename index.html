@@ -1,307 +1,762 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacroFi Studio — Умный Конвертер Макросов</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome для иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* Полностью автономные стили: работают без интернета и VPN */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: #11111b;
+
+        body {
+            background-color: #0b0b11;
+            color: #cdd6f4;
+            min-height: 100vh;
+            padding-bottom: 40px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #313244;
-            border-radius: 4px;
+
+        header {
+            background-color: #11111e;
+            border-bottom: 1px solid #252538;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cba6f7;
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, #94e2d5 0%, #cba6f7 100%);
+            color: #11111b;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(203, 166, 247, 0.2);
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #11111b;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-text h1 span {
+            font-size: 9px;
+            background-color: rgba(203, 166, 247, 0.2);
+            color: #cba6f7;
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: none;
+            border: 1px solid rgba(203, 166, 247, 0.3);
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #a6adc8;
+            margin-top: 2px;
+        }
+
+        .template-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-template {
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-template:hover {
+            background-color: #313244;
+            border-color: #cba6f7;
+        }
+
+        .btn-template svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 1024px) {
+            main {
+                grid-template-columns: 5fr 7fr;
+            }
+        }
+
+        .card {
+            background-color: #11111e;
+            border: 1px solid #252538;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-rainbow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #cba6f7, #89b4fa);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .card-title svg {
+            width: 18px;
+            height: 18px;
+            fill: #f9e2af;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: #a6adc8;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            background-color: #08080f;
+            border: 1px solid #313244;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #a6e3a1;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #cba6f7;
+        }
+
+        .btn-clear {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #a6adc8;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #e78284;
+            color: #11111b;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(90deg, #cba6f7 0%, #89b4fa 100%);
+            border: none;
+            color: #11111b;
+            font-weight: 900;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: filter 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary svg {
+            width: 16px;
+            height: 16px;
+            fill: #11111b;
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #a6adc8;
+            padding: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab-btn.active {
+            background-color: #cba6f7;
+            color: #11111b;
+            border-color: #cba6f7;
+            box-shadow: 0 4px 12px rgba(203, 166, 247, 0.15);
+        }
+
+        .tab-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .form-fields {
+            background-color: #08080f;
+            border: 1px solid #252538;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 10px;
+            color: #a6adc8;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            background-color: #11111e;
+            border: 1px solid #252538;
+            border-radius: 8px;
+            padding: 8px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #cba6f7;
+        }
+
+        .btn-add-manual {
+            width: 100%;
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #fff;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-add-manual:hover {
+            border-color: #cba6f7;
+            background-color: #252538;
+        }
+
+        .macro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #252538;
+            margin-bottom: 15px;
+        }
+
+        .macro-title-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid transparent;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 900;
+            outline: none;
+            padding: 2px 4px;
+            transition: border-color 0.2s;
+        }
+
+        .macro-title-input:focus {
+            border-color: #cba6f7;
+        }
+
+        .btn-clear-all {
+            background-color: rgba(231, 130, 132, 0.1);
+            border: 1px solid rgba(231, 130, 132, 0.2);
+            color: #e78284;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-all:hover {
+            background-color: #e78284;
+            color: #11111b;
+        }
+
+        .actions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+            min-height: 250px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed #252538;
+            border-radius: 12px;
+            background-color: rgba(8,8,15,0.3);
+            color: #a6adc8;
+            flex-grow: 1;
+        }
+
+        .empty-state svg {
+            width: 32px;
+            height: 32px;
+            fill: #585b70;
+            margin-bottom: 10px;
+        }
+
+        .action-item {
+            background-color: #181825;
+            border: 1px solid #252538;
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .action-item:hover {
+            border-color: #cba6f7;
+        }
+
+        .action-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .action-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-number {
+            width: 24px;
+            height: 24px;
+            background-color: #313244;
+            color: #cba6f7;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .action-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+
+        .badge-click {
+            background-color: rgba(203, 166, 247, 0.15);
+            color: #cba6f7;
+            border: 1px solid rgba(203, 166, 247, 0.2);
+        }
+
+        .badge-delay {
+            background-color: rgba(250, 179, 135, 0.15);
+            color: #fab387;
+            border: 1px solid rgba(250, 179, 135, 0.2);
+        }
+
+        .badge-image {
+            background-color: rgba(166, 227, 161, 0.15);
+            color: #a6e3a1;
+            border: 1px solid rgba(166, 227, 161, 0.2);
+        }
+
+        .action-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .control-btn {
+            background-color: #252538;
+            border: none;
+            color: #fff;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background-color: #313244;
+        }
+
+        .control-btn.delete:hover {
+            background-color: rgba(231, 130, 132, 0.2);
+            color: #e78284;
+        }
+
+        .control-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        .action-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 11px;
+            color: #a6adc8;
+            background-color: #08080f;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #252538;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #252538;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .format-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .format-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #a6adc8;
+        }
+
+        .format-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .format-btn {
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #a6adc8;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .format-btn.active {
+            background-color: #cba6f7;
+            color: #11111b;
+            border-color: #cba6f7;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-export.secondary {
+            background-color: #181825;
+            border: 1px solid #252538;
+            color: #fff;
+        }
+
+        .btn-export.secondary:hover {
+            background-color: #252538;
+        }
+
+        .btn-export.primary {
+            background: linear-gradient(90deg, #94e2d5 0%, #cba6f7 100%);
+            border: none;
+            color: #11111b;
+        }
+
+        .btn-export.primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-export svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .dropzone-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #252538;
+            border-radius: 12px;
+            background-color: rgba(8,8,15,0.4);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropzone-label:hover {
+            border-color: #cba6f7;
+            background-color: rgba(24,24,37,0.5);
+        }
+
+        .dropzone-label svg {
+            width: 20px;
+            height: 20px;
+            fill: #a6adc8;
+            margin-bottom: 5px;
+        }
+
+        .dropzone-text {
+            font-size: 11px;
+            color: #a6adc8;
+        }
+
+        .dropzone-text span {
+            color: #cba6f7;
+            font-weight: bold;
+        }
+
+        details {
+            background-color: #08080f;
+            border: 1px solid #252538;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        summary {
+            font-size: 11px;
+            font-weight: bold;
+            color: #a6adc8;
+            cursor: pointer;
+            user-select: none;
+            outline: none;
+        }
+
+        pre {
+            font-family: monospace;
+            font-size: 10px;
+            color: #a6e3a1;
+            background-color: #11111e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow-x: auto;
+            max-height: 150px;
+            border: 1px solid #252538;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #11111e;
+            border: 2px solid #cba6f7;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: #cba6f7;
+            display: flex;
+            align-items: center;
+        }
+
+        .toast-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .toast-text p:first-child {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .toast-text p:last-child {
+            font-size: 9px;
+            color: #a6adc8;
+            margin-top: 2px;
         }
     </style>
 </head>
-<body class="bg-[#0b0b11] text-[#cdd6f4] min-h-screen font-sans antialiased selection:bg-[#cba6f7]/30">
+<body>
 
-    <!-- Навигационная панель -->
-    <header class="border-b border-[#252538] bg-[#11111e]/90 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-tr from-[#94e2d5] to-[#cba6f7] text-[#11111b] p-2.5 rounded-xl shadow-lg shadow-[#cba6f7]/10">
-                <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><path d="M7.5 5.6L5.6 7.5L3.7 5.6L5.6 3.7L7.5 5.6M18.4 5.6L20.3 3.7L22.2 5.6L20.3 7.5L18.4 5.6M13 2H11V5H13V2M11 19H13V22H11V19M2 13V11H5V13H2M19 11H22V13H19V11M6 11.5L2 15.5L4.5 18L8.5 14L6 11.5M15.5 6L11.5 2L9 4.5L13 8.5L15.5 6M18 11.5L22 15.5L19.5 18L15.5 14L18 11.5M14 15.5L15.5 14L11.5 10L10 11.5L14 15.5Z"/></svg>
             </div>
-            <div>
-                <h1 class="text-xl font-black tracking-wider text-white uppercase flex items-center gap-2">
-                    MacroFi Studio <span class="text-[10px] bg-[#cba6f7]/20 text-[#cba6f7] px-2 py-0.5 rounded-full lowercase font-semibold tracking-normal border border-[#cba6f7]/30">v2.1 Pro</span>
-                </h1>
-                <p class="text-xs text-[#a6adc8]">Безошибочный импорт и интеллектуальный парсинг поврежденного кода</p>
+            <div class="logo-text">
+                <h1>MacroFi Studio <span>v2.8 Offline</span></h1>
+                <p>Полностью автономная версия без зависимости от интернета</p>
             </div>
         </div>
-        <div class="flex gap-2">
-            <button onclick="loadTemplate('shoot')" class="px-3 py-1.5 bg-[#181825] hover:bg-[#313244] text-xs font-semibold rounded-lg transition-all border border-[#252538] flex items-center gap-1.5 text-white">
-                <i class="fa-solid fa-crosshairs text-[#f38ba8]"></i> Шаблон: Автовыстрел
+        <div class="template-buttons">
+            <button onclick="loadTemplate('shoot')" class="btn-template">
+                <svg viewBox="0 0 24 24" fill="#f38ba8"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6H13V9H11V6M11,15H13V18H11V15M6,11H9V13H6V11M15,11H18V13H15V11M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10Z"/></svg>
+                Выстрел
             </button>
-            <button onclick="loadTemplate('bhop')" class="px-3 py-1.5 bg-[#181825] hover:bg-[#313244] text-xs font-semibold rounded-lg transition-all border border-[#252538] flex items-center gap-1.5 text-white">
-                <i class="fa-solid fa-rabbit text-[#fab387]"></i> Шаблон: Распрыжка
-            </button>
-        </div>
-    </header>
-
-    <!-- Основной контейнер -->
-    <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- ЛЕВАЯ КОЛОНКА: Ввод, Восстановление кода и Файлы (5 колонок) -->
-        <section class="lg:col-span-5 flex flex-col gap-6">
-            
-            <!-- Карточка Импорта и Восстановления сломанного кода -->
-            <div class="bg-[#11111e] border border-[#252538] rounded-2xl p-5 shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#cba6f7] to-[#89b4fa]"></div>
-                
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-[#f9e2af] text-lg"></i>
-                        <h2 class="text-md font-extrabold text-white">Восстановитель & Импортер</h2>
-                    </div>
-                    <span class="text-[10px] text-[#a6adc8] bg-[#313244] px-2 py-0.5 rounded-md font-mono">Авто-исправление скобок</span>
-                </div>
-                
-                <p class="text-xs text-[#a6adc8] mb-4 leading-relaxed">
-                    Вставьте любой код (даже поврежденный JSON, скопированный не полностью, как на вашем скриншоте). Алгоритм извлечет координаты и восстановит макрос.
-                </p>
-
-                <!-- Поле ввода кода -->
-                <div class="relative mb-4">
-                    <textarea id="rawCodeInput" rows="8" 
-                        class="w-full bg-[#08080f] border border-[#313244] rounded-xl p-3 text-xs font-mono text-[#a6e3a1] focus:outline-none focus:border-[#cba6f7] focus:ring-1 focus:ring-[#cba6f7] resize-none leading-relaxed"
-                        placeholder="// Можно вставлять поврежденный JSON с обрывками скобок вроде:&#10;},&#10;&quot;delay_ms&quot;: 50&#10;} ] } ] }"></textarea>
-                    <div class="absolute bottom-3 right-3 flex gap-1.5">
-                        <button onclick="clearRawInput()" class="p-1 px-2.5 bg-[#181825] hover:bg-[#e78284] hover:text-[#11111b] text-[10px] font-bold text-[#a6adc8] rounded-lg transition-all border border-[#252538]">
-                            Очистить
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Кнопка конвертации (Основной триггер) -->
-                <button onclick="convertRawCode()" class="w-full py-3.5 bg-gradient-to-r from-[#cba6f7] to-[#89b4fa] hover:brightness-110 text-[#11111b] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#cba6f7]/20 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-sm"></i> Исправить и Сконвертировать в MacroFi
-                </button>
-
-                <!-- Загрузка файла напрямую -->
-                <div class="mt-4 pt-4 border-t border-[#252538]">
-                    <p class="text-xs font-bold text-[#bac2de] mb-2"><i class="fa-solid fa-file-import text-[#94e2d5] mr-1"></i> Или загрузите файл макроса напрямую:</p>
-                    <div class="flex items-center justify-center w-full">
-                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#252538] border-dashed rounded-xl cursor-pointer hover:bg-[#181825]/50 hover:border-[#cba6f7] transition-all bg-[#08080f]/50">
-                            <div class="flex flex-col items-center justify-center pt-4 pb-4">
-                                <i class="fa-solid fa-cloud-arrow-up text-[#a6adc8] text-lg mb-1"></i>
-                                <p class="text-[11px] text-[#a6adc8]"><span class="font-bold text-[#cba6f7]">Нажмите</span> или перетащите файл</p>
-                                <p class="text-[9px] text-[#585b70]">Поддерживаются .mfi, .json, .txt</p>
-                            </div>
-                            <input type="file" id="fileUploadInput" class="hidden" accept=".mfi,.json,.txt" onchange="handleFileUpload(event)" />
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Добавление действия вручную -->
-            <div class="bg-[#11111e] border border-[#252538] rounded-2xl p-5 shadow-2xl">
-                <div class="flex items-center gap-2 mb-4">
-                    <i class="fa-solid fa-circle-plus text-[#94e2d5] text-lg"></i>
-                    <h2 class="text-md font-extrabold text-white">Добавить действие вручную</h2>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 mb-3">
-                    <button onclick="setActionForm('click')" id="btnFormClick" class="py-2 rounded-xl bg-[#cba6f7] text-[#11111b] text-xs font-bold transition-all flex flex-col items-center gap-1">
-                        <i class="fa-solid fa-arrow-pointer"></i> Клик (Тап)
-                    </button>
-                    <button onclick="setActionForm('delay')" id="btnFormDelay" class="py-2 rounded-xl bg-[#181825] hover:bg-[#252538] text-xs font-bold transition-all flex flex-col items-center gap-1">
-                        <i class="fa-solid fa-clock"></i> Пауза
-                    </button>
-                    <button onclick="setActionForm('image')" id="btnFormImage" class="py-2 rounded-xl bg-[#181825] hover:bg-[#252538] text-xs font-bold transition-all flex flex-col items-center gap-1">
-                        <i class="fa-solid fa-image"></i> Картинка
-                    </button>
-                </div>
-
-                <!-- Динамические поля формы -->
-                <div id="dynamicFormFields" class="space-y-3 bg-[#08080f] p-3 rounded-xl border border-[#252538]">
-                    <!-- Наполняется в JS -->
-                </div>
-
-                <button onclick="addActionFromForm()" class="w-full mt-3 py-2.5 bg-[#181825] hover:bg-[#252538] border border-[#252538] hover:border-[#cba6f7] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-square-plus"></i> Внедрить действие в список
-                </button>
-            </div>
-
-        </section>
-
-        <!-- ПРАВАЯ КОЛОНКА: Визуализация цепочки действий и Экспорт без ошибок (7 колонок) -->
-        <section class="lg:col-span-7 flex flex-col gap-6">
-            
-            <!-- Основной интерфейс воссоздания макроса -->
-            <div class="bg-[#11111e] border border-[#252538] rounded-2xl p-5 shadow-2xl flex flex-col min-h-[500px]">
-                
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-[#252538]">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#94e2d5] animate-pulse"></span>
-                        <input type="text" id="macroNameInput" value="Standoff 2 Auto-Clicker" 
-                            class="bg-transparent text-white font-black text-lg border-b border-transparent hover:border-[#313244] focus:border-[#cba6f7] focus:outline-none px-1 py-0.5 transition-colors">
-                    </div>
-                    <button onclick="clearAllActions()" class="px-3 py-1.5 bg-[#e78284]/10 hover:bg-[#e78284] text-[#e78284] hover:text-[#11111b] text-xs font-extrabold rounded-lg transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-trash-can"></i> Очистить всё
-                    </button>
-                </div>
-
-                <!-- Блок визуального отображения (фиолетовые карточки, как в MacroFi) -->
-                <div class="flex-1 flex flex-col gap-3" id="actionsListContainer">
-                    <!-- Сюда вставляются восстановленные шаги макроса -->
-                </div>
-
-                <!-- Подвал панели редактирования: Экспорт и Настройка вывода -->
-                <div class="mt-6 pt-5 border-t border-[#252538] flex flex-col gap-4">
-                    <div class="flex flex-wrap items-center justify-between gap-4">
-                        <div>
-                            <p class="text-[11px] text-[#a6adc8] mb-1 font-bold">Параметр сохранения:</p>
-                            <div class="flex gap-2">
-                                <button id="btnFormatMfi" onclick="setExportFormat('mfi')" class="px-3 py-1 bg-[#cba6f7] text-[#11111b] text-[10px] font-black rounded-lg border border-[#cba6f7] transition-all">
-                                    Совместимый .mfi (Рекомендуется)
-                                </button>
-                                <button id="btnFormatJson" onclick="setExportFormat('json')" class="px-3 py-1 bg-[#181825] hover:bg-[#252538] text-[#a6adc8] text-[10px] font-black rounded-lg border border-[#252538] transition-all">
-                                    Обычный .json (Сырой код)
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="copyJsonToClipboard()" class="flex-1 sm:flex-initial px-4 py-3 bg-[#181825] hover:bg-[#252538] text-white text-xs font-bold rounded-xl transition-all border border-[#252538] flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-copy"></i> Копировать JSON
-                            </button>
-                            <button onclick="exportMfiFile()" class="flex-1 sm:flex-initial px-6 py-3 bg-gradient-to-r from-[#94e2d5] to-[#cba6f7] hover:brightness-110 text-[#11111b] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#cba6f7]/10 flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-file-arrow-down"></i> Скачать файл для импорта
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Превью JSON -->
-            <div class="bg-[#08080f] border border-[#252538] rounded-2xl p-4">
-                <details class="group">
-                    <summary class="flex items-center justify-between cursor-pointer list-none text-xs font-bold text-[#a6adc8] group-open:mb-3">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-brackets-curly text-[#cba6f7]"></i> Валидный JSON код макроса (Сгенерированный автоматически)
-                        </span>
-                        <i class="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i>
-                    </summary>
-                    <pre id="jsonPreview" class="text-[10px] font-mono text-[#a6e3a1] bg-[#11111e] p-3 rounded-lg overflow-x-auto border border-[#252538] max-h-48">{}</pre>
-                </details>
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- Уведомления (Toast) -->
-    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 bg-[#11111e] border-2 border-[#cba6f7] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
-        <div class="text-[#cba6f7]" id="toastIcon">
-            <i class="fa-solid fa-circle-check text-lg"></i>
-        </div>
-        <div>
-            <p class="text-xs font-bold text-white" id="toastTitle">Успешно</p>
-            <p class="text-[10px] text-[#a6adc8]" id="toastMessage">Макрос обновлен!</p>
-        </div>
-    </div>
-
-    <script>
-        let macroActions = [];
-        let currentFormType = 'click';
-        let exportFormat = 'mfi'; // mfi или json
-
-        const templates = {
-            shoot: [
-                { id: 1, type: 'image', name: 'Поиск цели (Манекен)', imageName: 'target_dummy.png', similarity: 65, x: 800, y: 400, w: 320, h: 280 },
-                { id: 2, type: 'click', name: 'Авто-выстрел при обнаружении', x: 1650, y: 750, delay: 50 }
-            ],
-            bhop: [
-                { id: 1, type: 'click', name: 'Клик прыжка 1', x: 1750, y: 600, delay: 10 },
-                { id: 2, type: 'delay', name: 'Интервал распрыжки', delay: 380 },
-                { id: 3, type: 'click', name: 'Клик прыжка 2', x: 1750, y: 600, delay: 10 }
-            ]
-        };
-
-        window.onload = function() {
-            loadTemplate('shoot');
-            setActionForm('click');
-        };
-
-        function loadTemplate(name) {
-            if (templates[name]) {
-                macroActions = JSON.parse(JSON.stringify(templates[name]));
-                document.getElementById('macroNameInput').value = name === 'shoot' ? 'SO2 Auto Shoot' : 'SO2 BunnyHop';
-                renderActions();
-                showToast('Шаблон успешно применен', 'Вы можете настроить координаты', 'fa-solid fa-wand-magic-sparkles text-[#94e2d5]');
-            }
-        }
-
-        // Рендеринг фиолетовых карточек макроса
-        function renderActions() {
-            const container = document.getElementById('actionsListContainer');
-            container.innerHTML = '';
-
-            if (macroActions.length === 0) {
-                container.innerHTML = `
-                    <div class="flex-1 flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-[#252538] rounded-2xl bg-[#08080f]/50">
-                        <i class="fa-solid fa-folder-open text-[#585b70] text-3xl mb-2"></i>
-                        <p class="text-xs text-[#a6adc8]">Список действий пуст</p>
-                        <p class="text-[10px] text-[#585b70]">Вставьте поврежденный код слева или добавьте шаги вручную</p>
-                    </div>
-                `;
-                updateJsonPreview();
-                return;
-            }
-
-            macroActions.forEach((action, index) => {
-                let badge = '';
-                let infoHtml = '';
-
-                if (action.type === 'click') {
-                    badge = `<span class="bg-[#cba6f7]/20 text-[#cba6f7] text-[10px] font-bold px-2.5 py-1 rounded-md border border-[#cba6f7]/30 flex items-center gap-1"><i class="fa-solid fa-arrow-pointer text-[9px]"></i> Тап</span>`;
-                    infoHtml = `
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-[#a6adc8]">
-                            <div><span class="text-[#bac2de] font-semibold">Координаты:</span> X: ${action.x}, Y: ${action.y}</div>
-                            <div><span class="text-[#bac2de] font-semibold">Задержка:</span> ${action.delay || 0} мс</div>
-                        </div>
-                    `;
-                } else if (action.type === 'delay') {
-                    badge = `<span class="bg-[#fab387]/20 text-[#fab387] text-[10px] font-bold px-2.5 py-1 rounded-md border border-[#fab387]/30 flex items-center gap-1"><i class="fa-solid fa-clock text-[9px]"></i> Пауза</span>`;
-                    infoHtml = `
-                        <div class="mt-2 text-[11px] text-[#a6adc8]">
-                            <div><span class="text-[#bac2de] font-semibold">Задержка перед следующим действием:</span> ${action.delay} миллисекунд</div>
-                        </div>
-                    `;
-                } else if (action.type === 'image') {
-                    badge = `<span class="bg-[#a6e3a1]/20 text-[#a6e3a1] text-[10px] font-bold px-2.5 py-1 rounded-md border border-[#a6e3a1]/30 flex items-center gap-1"><i class="fa-solid fa-image text-[9px]"></i> Картинка</span>`;
-                    infoHtml = `
-                        <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-[#a6adc8]">
-                            <div><span class="text-[#bac2de] font-semibold">Шаблон цели:</span> ${action.imageName || 'target.png'}</div>
-                            <div><span class="text-[#bac2de] font-semibold">Точность совпадения:</span> ${action.similarity}%</div>
-                            <div class="col-span-2"><span class="text-[#bac2de] font-semibold">Окно поиска:</span> X:${action.x}, Y:${action.y}, W:${action.w}px, H:${action.h}px</div>
-                        </div>
-                    `;
-                }
-
-                const card = document.createElement('div');
-                card.className = "bg-[#181825]/90 border border-[#252538] hover:border-[#cba6f7] rounded-xl p-4 transition-all relative group shadow-lg";
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-6 h-6 rounded-lg bg-[#313244] text-[#cba6f7] font-black text-xs flex items-center justify-center">${index + 1}</span>
-                            <div>
-                                <h3 class="text-xs font-black text-white">${action.name || 'Действие'}</h3>
-                                <div class="flex gap-1.5 mt-1.5">${badge}</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
-                            <button onclick="moveAction(${index}, -1)" class="p-1 px-2 bg-[#252538] hover:bg-[#313244] text-white rounded-md text-[10px]" title="Вверх"><i class="fa-solid fa-arrow-up"></i></button>
-                            <button onclick="moveAction(${index}, 1)" class="p-1 px-2 bg-[#252538] hover:bg-[#313244] text-wh
+            <button onclick="loadTemplate('bhop')" class="btn-template">
+                <svg viewBox="0 0 24 24" fill="#fab387"><path d="M19.5,4C18.67,4 18,4.67 18,5.5C18,6.33 18.67,7 19.5,7C20.33,7 21,6.33 21,5.5C21,4.67 20.33,4 19.5,4M15.5,6C14.67,6 14,6.67 14,7.5C14,8.33
